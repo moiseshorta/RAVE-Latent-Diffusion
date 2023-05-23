@@ -10,8 +10,6 @@ RAVE-Latent Diffusion can generate audio faster than real-time on a consumer CPU
 
 Audio examples can be found [`here`](https://soundcloud.com/h-e-x-o-r-c-i-s-m-o-s/rave-latentdiffusion_unconditionalgeneration_seed2805182108), [`here`](https://soundcloud.com/h-e-x-o-r-c-i-s-m-o-s/rave-latent-diffusion_unconditionalgeneration_seed3069861997) and [`here`](https://soundcloud.com/h-e-x-o-r-c-i-s-m-o-s/s-1).
 
-<i>Instrucciones en español debajo...</i>
-
 ## Prerequisites:
 
 1) Pretrained RAVE model, exported as .ts file:
