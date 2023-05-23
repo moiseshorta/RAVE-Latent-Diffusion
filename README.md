@@ -10,7 +10,7 @@ RAVE-Latent Diffusion can generate audio faster than real-time on a consumer CPU
 
 Audio examples can be found [`here`](https://soundcloud.com/h-e-x-o-r-c-i-s-m-o-s/rave-latentdiffusion_unconditionalgeneration_seed2805182108), [`here`](https://soundcloud.com/h-e-x-o-r-c-i-s-m-o-s/rave-latent-diffusion_unconditionalgeneration_seed3069861997) and [`here`](https://soundcloud.com/h-e-x-o-r-c-i-s-m-o-s/s-1).
 
-## Prerequisites:
+## Prerequisites
 
 1) Pretrained RAVE model, exported as .ts file:
 > Make sure that your pre-trained RAVE model has a latent dimension size of powers of two. The default RAVE latent dimension size is 16. For more information on how to modify this, see the original [`RAVE`](https://github.com/acids-ircam/RAVE) repo. Make sure that when exporting your RAVE model you set ```--stereo=True```.
