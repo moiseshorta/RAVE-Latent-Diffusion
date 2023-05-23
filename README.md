@@ -55,7 +55,7 @@ python train.py --name name_for_your_run --latent_folder "/path/to/saved/encoded
 
 ## Unconditional generation
 
-Once you have trained the RAVE-Latent Diffusion model, you can now generate new latent codes with it. For example
+Once you have trained the RAVE-Latent Diffusion model, you can now generate new latent codes with it. For example:
 
 ```bash
 python generate.py --model_path "/path/to/trained/rave-latent-diffusion/model.pt" --rave_model "/path/to/your/pretrained/rave/model.ts" --diffusion_steps 100 --seed 664 --output_path "/path/to/save/generated/audio" --latent_length 4096 --latent_mult 1
