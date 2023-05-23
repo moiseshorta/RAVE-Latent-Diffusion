@@ -1,8 +1,9 @@
 # RAVE-Latent Diffusion
 Generate new latent codes for RAVE using Denoising Diffusion Probabilistic models.
 
-Author: Moisés Horta Valenzuela / [`𝔥𝔢𝔵𝔬𝔯𝔠𝔦𝔰𝔪𝔬𝔰`](https://twitter.com/hexorcismos)
-Year: 2023
+> Author: Moisés Horta Valenzuela / [`𝔥𝔢𝔵𝔬𝔯𝔠𝔦𝔰𝔪𝔬𝔰`](https://twitter.com/hexorcismos)
+> 
+> Year: 2023
 
 RAVE-Latent Diffusion is a denoising diffusion model designed to generate new [`RAVE`](https://github.com/acids-ircam/RAVE) latent codes with a large context window, faster than realtime, while maintaining music structural coherency. RAVE-Latent Diffusion can currently be used for unconditional RAVE latent generation, with the smallest context window of aprox. 1:30 minutes of audio (```preprocess.py --latent_length=2048 ...```) and can scale up to a context window of 11:30 minutes (```preprocess.py --latent_length=16384 ...```).
 RAVE-Latent Diffusion can generate audio faster than real-time on a consumer CPU, which allows for wide accesibility.
