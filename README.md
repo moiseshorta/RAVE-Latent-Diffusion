@@ -13,7 +13,7 @@ Audio examples can be found [`here`](https://soundcloud.com/h-e-x-o-r-c-i-s-m-o-
 ## Prerequisites:
 
 1) Pretrained RAVE model, exported as .ts file:
-> Make sure that your pre-trained RAVE model has a latent dimension size of powers of two. The default RAVE latent dimension size is 16. For more information on how to modify this, see the original [`RAVE`](https://github.com/acids-ircam/RAVE) repo.
+> Make sure that your pre-trained RAVE model has a latent dimension size of powers of two. The default RAVE latent dimension size is 16. For more information on how to modify this, see the original [`RAVE`](https://github.com/acids-ircam/RAVE) repo. Make sure that when exporting your RAVE model you set ```--stereo-True```.
 
 2) Audio dataset used to train RAVE model: 
 > The recommended audio dataset length is 3 hours, but training on more data will prevent overfitting. You can also train on audio that has not been 'heard' by the pre-trained RAVE model, but ultimately the fidelity of the generated audio will depend on the reconstruction quality that your pre-trained RAVE model has on your audio dataset.
