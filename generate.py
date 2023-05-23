@@ -3,13 +3,6 @@
 ####
 #### Author: Moises Horta Valenzuela / @hexorcismos
 #### Year: 2023
-#### Description:
-#### This script generates audio using a denoising diffusion model and a pretrained RAVE model.
-#### The script takes as input a pretrained diffusion model, a pretrained RAVE model, the number of diffusion steps,
-#### a random seed, an output path, and a name for the generated audio.
-#### It generates a specified number of audio files with the provided settings.
-#### The generation process involves creating latent codes with the diffusion model,
-#### decoding them with the RAVE model, and saving the resulting audio to the specified output path.
 
 import argparse
 import os
