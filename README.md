@@ -1,5 +1,5 @@
 # RAVE-Latent Diffusion
-Generate new latent codes for RAVE using Denoising Diffusion Probabilistic models.
+Generate new latent codes for RAVE with Denoising Diffusion Probabilistic models.
 
 > Author: Moisés Horta Valenzuela / [`𝔥𝔢𝔵𝔬𝔯𝔠𝔦𝔰𝔪𝔬𝔰`](https://twitter.com/hexorcismos)
 > 
