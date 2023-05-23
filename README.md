@@ -42,7 +42,7 @@ Code has been tested on Python 3.9.
 ```bash
 python preprocess.py --rave_model "/path/to/your/pretrained/rave/model.ts" --audio_folder "/path/to/your/audio/dataset" --latent_length 4096 --latent_folder "/path/to/save/encoded/rave/latents"
 ```
-This is where you define your context window with the flag ```--latent_length```. The default value is ```4096``` latents context window, which is about 2:55 minutes of audio at 48KHz samplerate.
+This is where you define your context window with the flag ```--latent_length```. The default value is ```4096``` latents context window, which is about 2:55 minutes of audio at 48KHz sample rate.
 You can adjust the sample rate to match your pretrained RAVE model with the  ```--sample_rate``` flag. Currently it supports 44100 and 48000Hz sample rates.
 
 ## Training
