@@ -1,0 +1,10 @@
+torch
+librosa
+git+https://github.com/moiseshorta/audio-diffusion-pytorch.git
+pydub
+transformers
+numpy
+scipy
+tqdm
+soundfile
+transformers==4.29.2
