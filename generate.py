@@ -154,7 +154,7 @@ def main():
     ### GENERATING WITH .PT FILE DIFFUSION
     model = DiffusionModel(
         net_t=UNetV0,
-        in_channels=16,
+        in_channels=args.rave_dims,
         channels=[256, 256, 256, 256, 512, 512, 512, 768, 768],
         factors=[1, 4, 4, 4, 2, 2, 2, 2, 2],
         items=[1, 2, 2, 2, 2, 2, 2, 4, 4],
