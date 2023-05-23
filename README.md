@@ -70,7 +70,7 @@ You can interpolate between two generated latent codes by setting the ```--lerp=
 ```bash
 python generate.py --model_path "/path/to/trained/rave-latent-diffusion/model.pt" --rave_model "/path/to/your/pretrained/rave/model.ts" --lerp True --diffusion_steps 100 --seed 664 --output_path "/path/to/save/generated/audio" --latent_length 4096 --latent_mult 1
 ```
-For mode control, you can set the seed of the starting and ending RAVE latent codes with the ```--seed_a``` and ```--seed_b``` flags, respectively. 
+For more control and reproducibility, you can set the seed of the starting and ending RAVE latent codes with the ```--seed_a``` and ```--seed_b``` flags, respectively. 
 
 ## Text to audio generation
 
