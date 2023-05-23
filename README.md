@@ -60,7 +60,7 @@ Once you have trained the RAVE-Latent Diffusion model, you can now generate new 
 ```bash
 python generate.py --model_path "/path/to/trained/rave-latent-diffusion/model.pt" --rave_model "/path/to/your/pretrained/rave/model.ts" --diffusion_steps 100 --seed 664 --output_path "/path/to/save/generated/audio" --latent_length 4096 --latent_mult 1
 ```
-This command will generate a 4096 RAVE latents, defined by ```--latent_length=4096``` and multiply it by 1, defined by ```--latent_mult=1```. You can generate longer audio by modifying ```--latent_mult``` to 2 or another int. Be aware that your PC might run out of memory if the generated latent is too long. 
+This command will generate ```4096``` RAVE latents, defined by ```--latent_length=4096``` and multiply it by 1, defined by ```--latent_mult=1```. You can generate longer audio by modifying ```--latent_mult``` to 2 or another int. Be aware that your PC might run out of memory if the generated latent is too long. 
 Keep in mind that RAVE-Latent Diffusion produces best results when the ```--latent_length``` is equal or higher than the context window used to train the diffusion model. This value is defined by the ```--latent_length``` flag in the Preprocessing step.
 
 ## Spherical interpolation between generated RAVE latents
