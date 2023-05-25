@@ -119,7 +119,7 @@ def interpolate_seeds(model, rave, args, seed):
             for i in range(num_steps):
                 diff1 = model.sample(noise1, num_steps=args.diffusion_steps)
                 diff2 = model.sample(noise2, num_steps=args.diffusion_steps)
-                diff = slerp(torch.linspace(0., args.lerp_factor, z_length), diff1, diff2)
+                diff = slerp(torch.linspace(0., args.lerp_factor, z_length).to(device), diff1, diff2)
                 pbar.update(1)
 
         diff_mean = diff.mean()
