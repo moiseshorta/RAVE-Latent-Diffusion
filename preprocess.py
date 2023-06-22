@@ -55,6 +55,8 @@ def encode_and_save_latent(rave, audio_data, audio_file, latent_folder, latent_l
 def main():
     args = parse_args()
 
+    os.makedirs(args.latent_folder, exist_ok=True)
+    
     rave = torch.jit.load(args.rave_model).to(device)
 
     audio_files = [f for f in os.listdir(args.audio_folder) if f.endswith(".wav")]
