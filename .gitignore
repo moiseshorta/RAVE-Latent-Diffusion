@@ -1,0 +1,7 @@
+data/
+latents/
+*.ts
+*.ipynb
+*.npy
+*.pt
+*.wav
