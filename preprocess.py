@@ -12,7 +12,12 @@ import numpy as np
 from torch.utils.data import Dataset
 from pydub import AudioSegment
 
-device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
+if torch.cuda.is_available():
+    device = torch.device("cuda:0")
+elif torch.backends.mps.is_available:
+    device = torch.device("mps:0")
+else:
+    device = torch.device("cpu")
 
 def parse_args():
     parser = argparse.ArgumentParser()
@@ -30,7 +35,7 @@ def encode_and_save_latent(rave, audio_data, audio_file, latent_folder, latent_l
 
         print("Audio",audio_file)
 
-        if device.type == 'cuda':
+        if device.type != 'cpu':
             x = x.to(device)
             rave = rave.to(device)
 
@@ -41,7 +46,7 @@ def encode_and_save_latent(rave, audio_data, audio_file, latent_folder, latent_l
         z_std = z.std()
         z = (z - z_mean) / z_std
 
-        if device.type == 'cuda':
+        if device.type != 'cpu':
             z = z.cpu()
 
         z = torch.nn.functional.pad(z, (0, latent_length - z.shape[2]))
