@@ -14,7 +14,7 @@ from pydub import AudioSegment
 
 if torch.cuda.is_available():
     device = torch.device("cuda:0")
-elif torch.backends.mps.is_available:
+elif torch.backends.mps.is_available():
     device = torch.device("mps:0")
 else:
     device = torch.device("cpu")
@@ -25,7 +25,7 @@ def parse_args():
     parser.add_argument('--audio_folder', type=str, default='/path/to/audio_folder', help='Path to the folder containing audio files.')
     parser.add_argument('--sample_rate', type=int, default=48000, choices=[44100, 48000], help='Sample rate for the audio files.')
     parser.add_argument('--latent_length', type=int, default=4096, choices=[2048, 4096, 8192, 16384], help='Length of saved RAVE latents.')
-    parser.add_argument('--latent_folder', type=str, default='/path/to/latent_folder', help='Path to the folder where RAVE latent files will be saved.')
+    parser.add_argument('--latent_folder', type=str, default='latents', help='Path to the folder where RAVE latent files will be saved.')
     return parser.parse_args()
 
 def encode_and_save_latent(rave, audio_data, audio_file, latent_folder, latent_length):
