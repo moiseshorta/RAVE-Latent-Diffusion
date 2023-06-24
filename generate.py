@@ -16,7 +16,12 @@ from audio_diffusion_pytorch import DiffusionModel, UNetV0, VDiffusion, VSampler
 torch._C._jit_set_profiling_mode(False)
 torch._C._jit_set_profiling_executor(False)
 
-device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
+if torch.cuda.is_available():
+    device = torch.device("cuda:0")
+elif torch.backends.mps.is_available():
+    device = torch.device("mps")
+else:
+    device = torch.device("cpu")
 
 # Parse the input arguments for the script.
 def parse_args():

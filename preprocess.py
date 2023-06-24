@@ -12,7 +12,12 @@ import numpy as np
 from torch.utils.data import Dataset
 from pydub import AudioSegment
 
-device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
+if torch.cuda.is_available():
+    device = torch.device("cuda:0")
+elif torch.backends.mps.is_available():
+    device = torch.device("mps:0")
+else:
+    device = torch.device("cpu")
 
 def parse_args():
     parser = argparse.ArgumentParser()
@@ -20,7 +25,7 @@ def parse_args():
     parser.add_argument('--audio_folder', type=str, default='/path/to/audio_folder', help='Path to the folder containing audio files.')
     parser.add_argument('--sample_rate', type=int, default=48000, choices=[44100, 48000], help='Sample rate for the audio files.')
     parser.add_argument('--latent_length', type=int, default=4096, choices=[2048, 4096, 8192, 16384], help='Length of saved RAVE latents.')
-    parser.add_argument('--latent_folder', type=str, default='/path/to/latent_folder', help='Path to the folder where RAVE latent files will be saved.')
+    parser.add_argument('--latent_folder', type=str, default='latents', help='Path to the folder where RAVE latent files will be saved.')
     return parser.parse_args()
 
 def encode_and_save_latent(rave, audio_data, audio_file, latent_folder, latent_length):
@@ -30,7 +35,7 @@ def encode_and_save_latent(rave, audio_data, audio_file, latent_folder, latent_l
 
         print("Audio",audio_file)
 
-        if device.type == 'cuda':
+        if device.type != 'cpu':
             x = x.to(device)
             rave = rave.to(device)
 
@@ -41,7 +46,7 @@ def encode_and_save_latent(rave, audio_data, audio_file, latent_folder, latent_l
         z_std = z.std()
         z = (z - z_mean) / z_std
 
-        if device.type == 'cuda':
+        if device.type != 'cpu':
             z = z.cpu()
 
         z = torch.nn.functional.pad(z, (0, latent_length - z.shape[2]))
@@ -55,6 +60,8 @@ def encode_and_save_latent(rave, audio_data, audio_file, latent_folder, latent_l
 def main():
     args = parse_args()
 
+    os.makedirs(args.latent_folder, exist_ok=True)
+    
     rave = torch.jit.load(args.rave_model).to(device)
 
     audio_files = [f for f in os.listdir(args.audio_folder) if f.endswith(".wav")]

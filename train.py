@@ -16,7 +16,12 @@ from torch.utils.data import Dataset, DataLoader
 
 from audio_diffusion_pytorch import DiffusionModel, UNetV0, VDiffusion, VSampler
 
-device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
+if torch.cuda.is_available():
+    device = torch.device("cuda:0")
+elif torch.backends.mps.is_available():
+    device = torch.device("mps:0")
+else:
+    device = torch.device("cpu")
 current_date = datetime.date.today()
 
 class RaveDataset(Dataset):
@@ -90,6 +95,8 @@ def main():
     global best_epoch
     best_epoch = None
     best_loss = float('inf')
+
+    os.makedirs(args.save_out_path, exist_ok=True)
 
     latent_files = [f for f in os.listdir(latent_folder) if f.endswith(".npy")]
 
