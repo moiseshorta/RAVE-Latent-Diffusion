@@ -94,11 +94,14 @@ def generate_audio(model, rave, args, seed):
 
         y = y.reshape(-1).detach().numpy()
 
-        y_left  = y[:len(y)//2]
-        y_right = y[len(y)//2:]
+        if rave.stereo:
+            y_l = y[:len(y)//2]
+            y_r = y[len(y)//2:]
+            y = np.stack((y_l, y_r), axis=-1)
 
-        y_stereo = np.stack((y_left, y_right), axis=-1)
-        sf.write(f'{args.output_path}/rave-latent_diffusion_seed{seed}_{args.name}_{rave_model_name}.wav', y_stereo, args.sample_rate)
+        path = f'{args.output_path}/rave-latent_diffusion_seed{seed}_{args.name}_{rave_model_name}.wav'
+        print(f"Writing {path}")
+        sf.write(path, y, args.sample_rate)
 
 # Generate audio by slerping between two diffusion generated RAVE latents.
 def interpolate_seeds(model, rave, args, seed):
@@ -140,14 +143,16 @@ def interpolate_seeds(model, rave, args, seed):
         rave = rave.cpu()
         diff = diff.cpu()
         y = rave.decode(diff)
-
         y = y.reshape(-1).detach().numpy()
 
-        y_left  = y[:len(y)//2]
-        y_right = y[len(y)//2:]
+        if rave.stereo:
+            y_l = y[:len(y)//2]
+            y_r = y[len(y)//2:]
+            y = np.stack((y_l, y_r), axis=-1)
 
-        y_stereo = np.stack((y_left, y_right), axis=-1)
-        sf.write(f'{args.output_path}/rave-latent_diffusion_seed{seed}_{args.name}_{rave_model_name}_slerp.wav', y_stereo, args.sample_rate)
+        path = f'{args.output_path}/rave-latent_diffusion_seed{seed}_{args.name}_{rave_model_name}_slerp.wav'
+        print(f"Writing {path}")
+        sf.write(path, y, args.sample_rate)
 
 # Main function sets up the models and generates the audio.
 def main():
