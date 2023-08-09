@@ -75,14 +75,10 @@ def generate_audio(model, rave, args, seed):
 
         model.eval()
 
-        num_steps = 1
-        with tqdm(total=num_steps) as pbar:
-            for i in range(num_steps):
-                ### GENERATING WITH .PT FILE
-                diff = model.sample(noise, num_steps=args.diffusion_steps)
-                # diff = model(noise)
-                # noise = diff
-                pbar.update(1)
+        ### GENERATING WITH .PT FILE
+        diff = model.sample(noise, num_steps=args.diffusion_steps, show_progress=True)
+        # diff = model(noise)
+        # noise = diff
 
         diff_mean = diff.mean()
         diff_std = diff.std()
@@ -90,13 +86,14 @@ def generate_audio(model, rave, args, seed):
 
         rave = rave.cpu()
         diff = diff.cpu()
+        print("Decoding using RAVE Model...")
         y = rave.decode(diff)
-
         y = y.reshape(-1).detach().numpy()
 
         if rave.stereo:
             y_l = y[:len(y)//2]
             y_r = y[len(y)//2:]
+
             y = np.stack((y_l, y_r), axis=-1)
 
         path = f'{args.output_path}/rave-latent_diffusion_seed{seed}_{args.name}_{rave_model_name}.wav'
@@ -128,13 +125,9 @@ def interpolate_seeds(model, rave, args, seed):
 
         model.eval()
 
-        num_steps = 1
-        with tqdm(total=num_steps) as pbar:
-            for i in range(num_steps):
-                diff1 = model.sample(noise1, num_steps=args.diffusion_steps)
-                diff2 = model.sample(noise2, num_steps=args.diffusion_steps)
-                diff = slerp(torch.linspace(0., args.lerp_factor, z_length).to(device), diff1, diff2)
-                pbar.update(1)
+        diff1 = model.sample(noise1, num_steps=args.diffusion_steps, show_progress=True)
+        diff2 = model.sample(noise2, num_steps=args.diffusion_steps, show_progress=True)
+        diff = slerp(torch.linspace(0., args.lerp_factor, z_length).to(device), diff1, diff2)
 
         diff_mean = diff.mean()
         diff_std = diff.std()
@@ -142,6 +135,7 @@ def interpolate_seeds(model, rave, args, seed):
 
         rave = rave.cpu()
         diff = diff.cpu()
+        print("Decoding using RAVE Model...")
         y = rave.decode(diff)
         y = y.reshape(-1).detach().numpy()
 
