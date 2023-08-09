@@ -32,7 +32,7 @@ def parse_args():
     parser = argparse.ArgumentParser(description="Generate RAVE latents using diffusion model.")
     parser.add_argument("--model_path", type=str, required=True, default=None, help="Path to the pretrained diffusion model checkpoint.")
     parser.add_argument("--rave_model", type=str, required=True, default=None, help="Path to the pretrained RAVE model (.ts).")
-    parser.add_argument("--sample_rate", type=int, default=48000, choices=[44100, 48000], help="Sample rate for generated audio. Should match samplerate of RAVE model.")
+    parser.add_argument("--sample_rate", type=int, default=None, choices=[44100, 48000], help="Sample rate for generated audio. Should match samplerate of RAVE model.")
     parser.add_argument("--diffusion_steps", type=int, default=100, help="Number of steps for denoising diffusion.")
     parser.add_argument("--seed", type=int, default=random.randint(0,2**31-1), help="Random seed for generation.")
     parser.add_argument('--latent_length', type=int, default=4096, choices=[2048, 4096, 8192, 16384], help='Length of generated RAVE latents.')
@@ -155,6 +155,11 @@ def main():
 
     rave = torch.jit.load(args.rave_model).to(device)
     rave_dims = get_latent_dim(rave)
+
+    if not args.sample_rate:
+        msg = "RAVE model doesn't store its sample rate. --sample_rate is required."
+        assert hasattr(rave, "sr"), msg
+        args.sample_rate = rave.sr
 
     ### GENERATING WITH .PT FILE DIFFUSION
     model = DiffusionModel(
