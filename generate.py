@@ -1,7 +1,7 @@
 #### RAVE-Latent Diffusion
 #### https://github.com/moiseshorta/RAVE-Latent-Diffusion
 ####
-#### Author: Moises Horta Valenzuela / @hexorcismos
+#### Author: Moisés Horta Valenzuela / @hexorcismos
 #### Year: 2023
 
 import argparse
