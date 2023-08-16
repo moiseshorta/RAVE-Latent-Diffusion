@@ -40,16 +40,16 @@ def parse_args():
 def encode_and_save_latent(rave, audio_data, audio_file, latent_folder, latent_length):
     with torch.no_grad():
 
-        x = torch.from_numpy(audio_data).reshape(1, 1, -1).float()
+        x = torch.from_numpy(audio_data).reshape(1, 1, -1)
 
-        print("Audio",audio_file)
+        print("Audio", audio_file)
 
         if device.type != 'cpu':
             x = x.to(device)
             rave = rave.to(device)
 
         z = rave.encode(x)
-        print("Encoded into latent",z.shape)
+        print("Encoded into latent", z.shape)
 
         z_mean = z.mean()
         z_std = z.std()
@@ -112,7 +112,7 @@ def main():
 
         pbar.set_description(os.path.relpath(audio_file, args.audio_folder))
         for (i, chunk_bytes) in enumerate(chunks):
-            cropped_data = np.frombuffer(chunk_bytes, dtype=np.int16)
+            cropped_data = np.frombuffer(chunk_bytes, dtype=np.int16).astype(np.float32) / 2**15
             output_file = f"{dir_hash}_{base_name}_part{i:03d}.wav"
             pbar.set_postfix_str(f"chunk:{i}")
             encode_and_save_latent(rave, cropped_data, output_file, args.latent_folder, args.latent_length)
