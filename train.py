@@ -36,6 +36,8 @@ class RaveDataset(Dataset):
             z = torch.from_numpy(z).float().squeeze()
             self.latent_data.append(z)
 
+        self.latent_size = self.latent_data[0].shape[0]
+
     def __len__(self):
         return len(self.latent_data)
 
@@ -55,7 +57,6 @@ def parse_args():
     parser.add_argument("--accumulation_steps", type=int, default=2, help="Number of gradient accumulation steps.")
     parser.add_argument("--save_interval", type=int, default=50, help="Interval (number of epochs) at which to save the model.")
     parser.add_argument("--finetune", type=bool, default=False, help="Finetune model.")
-    parser.add_argument("--rave_dims", type=int, choices=[4, 8, 16, 32, 64, 128], default=16, help="Number of hidden dimensions in RAVE model.")
     return parser.parse_args()
 
 def set_seed(seed=664):
@@ -110,6 +111,8 @@ def main():
     train_dataset = RaveDataset(latent_folder, train_latent_files)
     val_dataset = RaveDataset(latent_folder, val_latent_files)
 
+    rave_dims = train_dataset.latent_size
+
     batch_size = args.batch_size
 
     train_data_loader = DataLoader(train_dataset, batch_size=batch_size, shuffle=True, num_workers=8, pin_memory=True)
@@ -117,7 +120,7 @@ def main():
 
     model = DiffusionModel(
         net_t=UNetV0,
-        in_channels=args.rave_dims,
+        in_channels=rave_dims,
         channels=[256, 256, 256, 256, 512, 512, 512, 768, 768],
         factors=[1, 4, 4, 4, 2, 2, 2, 2, 2],
         items=[1, 2, 2, 2, 2, 2, 2, 4, 4],

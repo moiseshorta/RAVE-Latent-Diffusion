@@ -23,13 +23,16 @@ elif torch.backends.mps.is_available():
 else:
     device = torch.device("cpu")
 
+
+def get_latent_dim(rave):
+    return rave.decode_params[0].item()
+
 # Parse the input arguments for the script.
 def parse_args():
     parser = argparse.ArgumentParser(description="Generate RAVE latents using diffusion model.")
     parser.add_argument("--model_path", type=str, required=True, default=None, help="Path to the pretrained diffusion model checkpoint.")
     parser.add_argument("--rave_model", type=str, required=True, default=None, help="Path to the pretrained RAVE model (.ts).")
-    parser.add_argument("--rave_dims", type=int, choices=[4, 8, 16, 32, 64, 128], default=16, help="Number of hidden dimensions in RAVE model.")
-    parser.add_argument("--sample_rate", type=int, default=48000, choices=[44100, 48000], help="Sample rate for generated audio. Should match samplerate of RAVE model.")
+    parser.add_argument("--sample_rate", type=int, default=None, choices=[44100, 48000], help="Sample rate for generated audio. Should match samplerate of RAVE model.")
     parser.add_argument("--diffusion_steps", type=int, default=100, help="Number of steps for denoising diffusion.")
     parser.add_argument("--seed", type=int, default=random.randint(0,2**31-1), help="Random seed for generation.")
     parser.add_argument('--latent_length', type=int, default=4096, choices=[2048, 4096, 8192, 16384], help='Length of generated RAVE latents.')
@@ -57,9 +60,10 @@ def generate_audio(model, rave, args, seed):
         np.random.seed(seed)
         random.seed(seed)
 
+        rave_dims = get_latent_dim(rave)
         z_length = args.latent_length * args.length_mult
 
-        noise = torch.randn(1, args.rave_dims, z_length).to(device)
+        noise = torch.randn(1, rave_dims, z_length).to(device)
         noise = noise * args.temperature
 
         rave_model_name = os.path.basename(args.rave_model).split(".")[0]
@@ -71,14 +75,10 @@ def generate_audio(model, rave, args, seed):
 
         model.eval()
 
-        num_steps = 1
-        with tqdm(total=num_steps) as pbar:
-            for i in range(num_steps):
-                ### GENERATING WITH .PT FILE
-                diff = model.sample(noise, num_steps=args.diffusion_steps)
-                # diff = model(noise)
-                # noise = diff
-                pbar.update(1)
+        ### GENERATING WITH .PT FILE
+        diff = model.sample(noise, num_steps=args.diffusion_steps, show_progress=True)
+        # diff = model(noise)
+        # noise = diff
 
         diff_mean = diff.mean()
         diff_std = diff.std()
@@ -86,15 +86,19 @@ def generate_audio(model, rave, args, seed):
 
         rave = rave.cpu()
         diff = diff.cpu()
+        print("Decoding using RAVE Model...")
         y = rave.decode(diff)
-
         y = y.reshape(-1).detach().numpy()
 
-        y_left  = y[:len(y)//2]
-        y_right = y[len(y)//2:]
+        if rave.stereo:
+            y_l = y[:len(y)//2]
+            y_r = y[len(y)//2:]
 
-        y_stereo = np.stack((y_left, y_right), axis=-1)
-        sf.write(f'{args.output_path}/rave-latent_diffusion_seed{seed}_{args.name}_{rave_model_name}.wav', y_stereo, args.sample_rate)
+            y = np.stack((y_l, y_r), axis=-1)
+
+        path = f'{args.output_path}/rave-latent_diffusion_seed{seed}_{args.name}_{rave_model_name}.wav'
+        print(f"Writing {path}")
+        sf.write(path, y, args.sample_rate)
 
 # Generate audio by slerping between two diffusion generated RAVE latents.
 def interpolate_seeds(model, rave, args, seed):
@@ -103,10 +107,12 @@ def interpolate_seeds(model, rave, args, seed):
 
         z_length = args.latent_length * args.length_mult
 
+        rave_dims = get_latent_dim(rave)
+
         torch.manual_seed(args.seed_a)
-        noise1 = torch.randn(1, args.rave_dims, z_length).to(device) * args.temperature
+        noise1 = torch.randn(1, rave_dims, z_length).to(device) * args.temperature
         torch.manual_seed(args.seed_b)
-        noise2 = torch.randn(1, args.rave_dims, z_length).to(device) * args.temperature
+        noise2 = torch.randn(1, rave_dims, z_length).to(device) * args.temperature
 
         rave_model_name = os.path.basename(args.rave_model).split(".")[0]
         diffusion_model_name = os.path.basename(args.model_path)
@@ -119,13 +125,9 @@ def interpolate_seeds(model, rave, args, seed):
 
         model.eval()
 
-        num_steps = 1
-        with tqdm(total=num_steps) as pbar:
-            for i in range(num_steps):
-                diff1 = model.sample(noise1, num_steps=args.diffusion_steps)
-                diff2 = model.sample(noise2, num_steps=args.diffusion_steps)
-                diff = slerp(torch.linspace(0., args.lerp_factor, z_length).to(device), diff1, diff2)
-                pbar.update(1)
+        diff1 = model.sample(noise1, num_steps=args.diffusion_steps, show_progress=True)
+        diff2 = model.sample(noise2, num_steps=args.diffusion_steps, show_progress=True)
+        diff = slerp(torch.linspace(0., args.lerp_factor, z_length).to(device), diff1, diff2)
 
         diff_mean = diff.mean()
         diff_std = diff.std()
@@ -133,26 +135,35 @@ def interpolate_seeds(model, rave, args, seed):
 
         rave = rave.cpu()
         diff = diff.cpu()
+        print("Decoding using RAVE Model...")
         y = rave.decode(diff)
-
         y = y.reshape(-1).detach().numpy()
 
-        y_left  = y[:len(y)//2]
-        y_right = y[len(y)//2:]
+        if rave.stereo:
+            y_l = y[:len(y)//2]
+            y_r = y[len(y)//2:]
+            y = np.stack((y_l, y_r), axis=-1)
 
-        y_stereo = np.stack((y_left, y_right), axis=-1)
-        sf.write(f'{args.output_path}/rave-latent_diffusion_seed{seed}_{args.name}_{rave_model_name}_slerp.wav', y_stereo, args.sample_rate)
+        path = f'{args.output_path}/rave-latent_diffusion_seed{seed}_{args.name}_{rave_model_name}_slerp.wav'
+        print(f"Writing {path}")
+        sf.write(path, y, args.sample_rate)
 
 # Main function sets up the models and generates the audio.
 def main():
     args = parse_args()
 
     rave = torch.jit.load(args.rave_model).to(device)
+    rave_dims = get_latent_dim(rave)
+
+    if not args.sample_rate:
+        msg = "RAVE model doesn't store its sample rate. --sample_rate is required."
+        assert hasattr(rave, "sr"), msg
+        args.sample_rate = rave.sr
 
     ### GENERATING WITH .PT FILE DIFFUSION
     model = DiffusionModel(
         net_t=UNetV0,
-        in_channels=args.rave_dims,
+        in_channels=rave_dims,
         channels=[256, 256, 256, 256, 512, 512, 512, 768, 768],
         factors=[1, 4, 4, 4, 2, 2, 2, 2, 2],
         items=[1, 2, 2, 2, 2, 2, 2, 4, 4],
